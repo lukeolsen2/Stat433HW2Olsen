@@ -1,0 +1,39 @@
+---
+title: "Stat 433 HW2 Luke Olsen"
+output: github_document
+---
+
+## 1
+
+```{r}
+library(dplyr)
+library(nycflights13)
+library(ggplot2)
+
+sum(is.na(flights$dep_time))
+arrange(flights, desc(is.na(dep_time)))
+```
+
+**8255 flights have a missing departure time. dep_delay, arr_time, and arr_delay are also missing. I think this represents flights that were cancelled.**
+
+## 2
+
+```{r}
+mutate(flights, dep_time = ((dep_time %/% 100)*60) + (dep_time %%100), sched_dep_time = ((sched_dep_time %/% 100)*60) + (sched_dep_time %% 100))
+```
+
+## 3
+
+```{r}
+library(lubridate)
+flightd = flights %>% mutate(departure = make_datetime(year, month, day)) %>% 
+  group_by(departure) %>%
+  summarise(cancel = sum(is.na(dep_delay)), numb = n(),
+            mean.dep.delay = mean(dep_delay, na.rm = T), mean.arr.delay = mean(arr_delay, na.rm = T)) %>% 
+  ggplot(aes(x = cancel/numb)) +
+  geom_point(aes(y = mean.dep.delay), col = 'black', alpha = 0.5) +
+  geom_point(aes(y = mean.arr.delay), col = 'green', alpha = 0.5)
+flightd
+```
+
+**I do not see a pattern between the flights.**
